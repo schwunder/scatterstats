@@ -28,7 +28,8 @@ def filter_words(content):
     # Create list of word tokens
     token_list = []
     for token in my_doc:
-        token_list.append(token.text)
+        if token.pos_ != "VERB":
+            token_list.append(token.text)
 
     # Create list of word tokens after removing stopwords
     filtered_sentence = []
@@ -41,28 +42,10 @@ def filter_words(content):
     f = ' '.join(filtered_sentence)
     return f
 
-def m(dirx, filename):
-    return dirx + "/" + filename
+
 def load_all_from_dir(dir:str)->List[str]:
     5
 
-dir1 = "ml_wiki"
-dir2 = "stat_wiki"
-iterator1 = os.listdir(dir1)
-iterator2 = os.listdir(dir2)
-
-filenames1 = [m(dir1, filename) for filename in iterator1[:size]]
-filenames2 = [m(dir2, filename) for filename in iterator2[:size]]
-texts1 = []
-texts2 = []
-for fn in filenames1:
-    with open(fn, "r") as file:
-        text = file.read()
-        texts1.append(filter_words(text))
-for fn in filenames2:
-    with open(fn, "r") as file:
-        text = file.read()
-        texts2.append(filter_words(text))
 
 
 wikiscrap1 = {'texts': texts1,
