@@ -4,15 +4,10 @@ from typeguard import typechecked
 import spacy
 import pandas as pd
 import scattertext as st
+import spacy
+import pandas as pd
+import scattertext as st
 from toolz import thread_first
-
-
-# dirnames
-# max_len
-# pos_filter (Verb)
-# stop_words
-# replace_words
-# regex
 
 
 @typechecked
@@ -50,7 +45,7 @@ def filter_stopwords(text: str, nlp=spacy.load("en")) -> str:
 
 
 @typechecked
-def make_data_frame(texts: List[str], label: str):
+def make_data_frame(texts: List[str], label: str)-> pd.DataFrame:
     dicty = {
         'texts': texts,
         'labels': label
