@@ -1,77 +1,89 @@
 import os
-import pandas as pd
+from typing import List, Dict
 from typeguard import typechecked
-import scattertext as st
 import spacy
-from IPython.display import HTML, IFrame
-from spacy.lang.en.stop_words import STOP_WORDS
-from spacy.lang.en import English
-from typing import List, Dict, Union
-size = 25
+import pandas as pd
+import scattertext as st
+from toolz import thread_first
+
+
+# dirnames
+# max_len
+# pos_filter (Verb)
+# stop_words
+# replace_words
+# regex
+
 
 @typechecked
-def has_bad_symbol(text: str) -> bool:
-    return "((" in text or "{{" in text
+def load_size_from_dir(dir: str, size: int) -> List[str]:
+    iterator = os.listdir(dir)
+    filenames = [dir + "/" + filename for filename in iterator[:size]]
+    raw_texts = []
+    for fn in filenames:
+        with open(fn, "r") as file:
+            raw_text = file.read()
+            raw_texts.append(raw_text)
+    return raw_texts
 
 
+@typechecked
+def clean_text_list(raw_texts: List[str]) -> List[str]:
+    clean_texts = [raw_text.replace('=', ' ').replace('\\n', ' ').replace('\n', ' ').replace('\r', '').replace('  ', '')
+                   for raw_text in
+                   raw_texts]
+    return clean_texts
 
 
-def filter_words(content):
-    # Load English tokenizer, tagger, parser, NER and word vectors
-    nlp = English()
+@typechecked
+def filter_pos(text: str, pos: str, nlp=spacy.load("en")) -> str:
+    doc = nlp(text)
+    return " ".join([token.text for token in doc if token.pos_ != pos])
 
-    text = content.replace('\n', ' ').replace('\r', '').replace('  ', '')
 
-    #  "nlp" Object is used to create documents with linguistic annotations.
-    my_doc = nlp(text)
-
-    # Create list of word tokens
-    token_list = []
-    for token in my_doc:
-        if token.pos_ != "VERB":
-            token_list.append(token.text)
-
-    # Create list of word tokens after removing stopwords
-    filtered_sentence = []
+@typechecked
+def filter_stopwords(text: str, nlp=spacy.load("en")) -> str:
+    doc = nlp(text)
     bad = "\\"
-    for word in token_list:
-        lexeme = nlp.vocab[word]
-        if (len(word) > 5 and bad not in word):
-            if lexeme.is_stop == False:
-                filtered_sentence.append(word)
-    f = ' '.join(filtered_sentence)
-    return f
+    return ' '.join([word for word in [token.text for token in doc] if
+                     len(word) > 2 and bad not in word and not nlp.vocab[word].is_stop])
 
 
-def load_all_from_dir(dir:str)->List[str]:
-    5
+@typechecked
+def make_data_frame(texts: List[str], label: str):
+    dicty = {
+        'texts': texts,
+        'labels': label
+    }
+    return pd.DataFrame(dicty, columns=['texts', 'labels'])
 
 
+@typechecked
+def parse_to_df(dirname: str) -> pd.DataFrame:
+    # dirname = config["dirname"]
+    return thread_first(
+        dirname,
 
-wikiscrap1 = {'texts': texts1,
-              'labels': 'ml'
-              }
-wikiscrap2 =  {'texts': texts2,
-              'labels': 'stat'
-              }
+        (load_size_from_dir, 2),
+        clean_text_list,
+        lambda txt_lst: [filter_pos(filter_stopwords(text), 'VERB') for text in txt_lst],
+        (make_data_frame, dirname)
+    )
 
 
+def scatter_vis(dirs):
+    a, b = dirs
+    df = parse_to_df(a).append(parse_to_df(b), ignore_index=True)
+    nlp = spacy.load("en")
+    corpus = st.CorpusFromPandas(df, category_col='labels', text_col='texts', nlp=nlp).build()
+    html = st.produce_scattertext_explorer(corpus,
+                                           category=a,
+                                           category_name=a,
+                                           not_category_name=b,
+                                           width_in_pixels=1000,
+                                           )
+    return html
 
-df2 = pd.DataFrame(wikiscrap2, columns=['texts', 'labels'])
-df1 = pd.DataFrame(wikiscrap1, columns=['texts', 'labels'])
-df3 = df2.append(df1, ignore_index=True)
-print(df3)
-nlp = spacy.load('en')
-corpus = st.CorpusFromPandas(df3, category_col='labels', text_col='texts', nlp=nlp).build()
-html = st.produce_scattertext_explorer(corpus,
-          category='ml',
-          category_name='ml',
-          not_category_name='stat',
-          width_in_pixels=1000,
-          metadata=corpus.get_df()['labels'])
-open("Visualization.html", 'wb').write(html.encode('utf-8'))
-# x = ""
-# with open("Visualization.html") as html:
-#   x = html.read()
-# HTML(x)
 
+h = scatter_vis(["ml_wiki", "stat_wiki"])
+open("Visualization.html", 'wb').write(h.encode('utf-8'))

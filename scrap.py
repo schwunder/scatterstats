@@ -18,6 +18,7 @@ pure_links = [w.split("/")[-1] for w in navtable_links if w and "/wiki/" in w]
 print('asfads')
 import wikipedia
 print('sadfadsf')
+#%%time
 complete_content = [safe(w, wikipedia.page) for w in pure_links]
 print('adsfad')
 contents = [c.content for c in complete_content if c]
