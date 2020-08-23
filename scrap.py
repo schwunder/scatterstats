@@ -163,7 +163,4 @@ input2 = 'https://en.wikipedia.org/wiki/Machine_learning'
 h = scatter_vis(input1, input2)
 open("Visualization.html", 'wb').write(h.encode('utf-8'))
 
-# for idx, content in enumerate(contents):
-#     print(idx, "---")
-#     with open("stat_wiki/" + str(idx) + ".txt", "w+") as file:
-#         file.write(content.encode('unicode-escape').decode('utf-8'))
+

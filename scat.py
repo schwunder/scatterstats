@@ -78,7 +78,10 @@ def scatter_vis(dirs):
                                            width_in_pixels=1000,
                                            )
     return html
-
+# for idx, content in enumerate(contents):
+#     print(idx, "---")
+#     with open("stat_wiki/" + str(idx) + ".txt", "w+") as file:
+#         file.write(content.encode('unicode-escape').decode('utf-8'))
 
 h = scatter_vis(["ml_wiki", "stat_wiki"])
 open("Visualization.html", 'wb').write(h.encode('utf-8'))
