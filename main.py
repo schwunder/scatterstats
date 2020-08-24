@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-
+from scrap import scatter_vis
 
 origins = [
     "*",
@@ -37,8 +37,9 @@ def read_root():
 
 @app.post("/items/")
 async def create_item(item: Item):
-    f = {"x":item.a, "y":item.b}
-    return json.dumps(f)
+    f = scatter_vis(item.a, item.b)
+    open("wwwaa.html", 'wb').write(f.encode('utf-8'))
+    return "wwwaa.html"
 
 @app.get("/items/{item}")
 def read_item(item):

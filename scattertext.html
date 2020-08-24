@@ -14,6 +14,10 @@
     <input type="text" id="wiki2" name="wiki2">
 </form>
 <button id="hubert" type="button" onclick="myFunction()">commit</button>
+<div id="hi">
+    "dsfas"
+</div>
+
 <script>
 
     const url = "http://127.0.0.1:8000/items/5"
@@ -22,37 +26,30 @@
         page1 = document.getElementById("wiki1").value;
         page2 = document.getElementById("wiki2").value;
 
+        input1 = 'https://en.wikipedia.org/wiki/Bayesian_statistics'
+        input2 = 'https://en.wikipedia.org/wiki/Machine_learning'
+        var myHeaders = new Headers();
+        myHeaders.append("Accept", "application/json");
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify({"a": input1, "b": input2});
+
+        var requestOptions = {
+            mode: 'cors',
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("http://127.0.0.1:8000/items/", requestOptions)
+            .then(response => response.json())
+            .then(result => window.open(result))
+            //.then(result => document.getElementsByTagName("html")[0].innerHTML = result)
+            .catch(error => console.log('error', error))
+
+
     }
-
-    var myHeaders = new Headers();
-    myHeaders.append("Accept", "application/json");
-    myHeaders.append("Content-Type", "application/json");
-
-    var raw = JSON.stringify({"a": "sweq", "b": "saw"});
-
-    var requestOptions = {
-        mode: 'cors',
-        method: 'POST',
-        headers: myHeaders,
-        body: raw,
-        redirect: 'follow'
-    };
-
-    fetch("http://127.0.0.1:8000/items/", requestOptions)
-        .then(response => response.json())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error))
-
-
-    var requestOptions2 = {
-  method: 'GET',
-  redirect: 'follow'
-};
-
-fetch("http://127.0.0.1:8000/items/5", requestOptions2)
-  .then(response => response)
-  .then(result => console.log(result))
-  .catch(error => console.log('error', error));
 
 
 </script>

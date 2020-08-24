@@ -45,38 +45,39 @@ def spy(x):
 #class TextClean:
 #   @staticmethod
 
+@timeit
 @typechecked
 def get_soup(elem: requests.models.Response) -> BeautifulSoup:
     soup = BeautifulSoup(elem.text, features="html.parser")
     return soup
 
-
+@timeit
 @typechecked
 def get_html_elem(elem: BeautifulSoup) -> bs4.element.Tag:
 
     navtable = elem.find_all('table', attrs={'class': 'vertical-navbox nowraplinks hlist'}) or elem.find_all('table', attrs={'class': 'vertical-navbox nowraplinks'})
     return navtable[0]
 
-
+@timeit
 @typechecked
 def get_links_to_elem(elem: bs4.element.Tag, max=10) -> List[Union[str, None]]:
     navtable_links = [d.get("href") for d in elem.descendants if d.name == "a"]
     return navtable_links[:max]
 
-
+@timeit
 @typechecked
 def get_pure_links(elem: List[Union[str, None]]) -> List[Union[str, None]]:
     pure_links = [w.split("/")[-1] for w in elem if w and "/wiki/" in w]
     return pure_links
 
-
+@timeit
 @typechecked
 def get_pages_from_links(elem: List[Union[str, None]], origin: str) -> Maybe_WikiPages:
     complete_content = [safe(w, wiki_wiki.page) for w in elem]
     complete_content.append(safe(origin, wiki_wiki.page))
     return complete_content
 
-
+@timeit
 @typechecked
 def get_texts_from_pages(elem: Maybe_WikiPages) -> List[Union[str, None]]:
     contents = [c.text for c in elem if c]
@@ -90,7 +91,7 @@ def clean_text_list(raw_texts: List[str]) -> List[str]:
                    raw_texts]
     return clean_texts
 
-
+@timeit
 @typechecked
 def filter_stopwords(text: str, nlp=spacy.load("en")) -> str:
     doc = nlp(text)
@@ -109,12 +110,12 @@ def filter_pos(text: str, pos: str, nlp=spacy.load("en")) -> str:
     doc = nlp(text)
     return " ".join([token.text for token in doc if token.pos_ != pos])
 
-
+@timeit
 @typechecked
 def filter_pos_wrap(texts: List[str], pos: str) -> List[str]:
     return [filter_pos(text, pos) for text in texts]
 
-
+@timeit
 @typechecked
 def make_data_frame(texts: List[str], label: str) -> pd.DataFrame:
     dicty = {
@@ -125,14 +126,14 @@ def make_data_frame(texts: List[str], label: str) -> pd.DataFrame:
 
 
 
-
+@timeit
 def pipe(in_page):
     a = str(in_page.split("/")[-1])
     return thread_first(in_page,
                         requests.get,
                         get_soup,
                         get_html_elem,
-                        get_links_to_elem,
+                        (get_links_to_elem, 3),
                         get_pure_links,
                         (get_pages_from_links, a),
                         get_texts_from_pages,
@@ -142,7 +143,7 @@ def pipe(in_page):
                         (make_data_frame, a)
                         )
 
-
+@timeit
 def scatter_vis(in1, in2):
     a = str(in1.split("/")[-1])
     b = str(in2.split("/")[-1])
