@@ -23,8 +23,9 @@
     const url = "http://127.0.0.1:8000/items/5"
 
     function myFunction() {
-        page1 = document.getElementById("wiki1").value;
-        page2 = document.getElementById("wiki2").value;
+        var page1 = document.getElementById("wiki1").value;
+        var page2 = document.getElementById("wiki2").value;
+        console.log(page2, typeof (page2))
 
         var myHeaders = new Headers();
         myHeaders.append("Accept", "application/json");
@@ -42,6 +43,8 @@
 
         fetch("http://127.0.0.1:8000/items/", requestOptions)
             .then(response => response.json())
+            .then(r => {console.log(r);
+            return r})
             .then(result => window.open(result))
             //.then(result => document.getElementsByTagName("html")[0].innerHTML = result)
             .catch(error => console.log('error', error))

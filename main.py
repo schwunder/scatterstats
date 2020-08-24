@@ -24,22 +24,25 @@ app.add_middleware(
 )
 
 
-
 class Item(BaseModel):
     a: str
     b: str
 
+
 import json
+
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 @app.post("/items/")
 async def create_item(item: Item):
     f = scatter_vis(item.a, item.b)
     open("wwwaa.html", 'wb').write(f.encode('utf-8'))
     return "wwwaa.html"
+
 
 @app.get("/items/{item}")
 def read_item(item):
