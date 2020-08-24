@@ -26,13 +26,11 @@
         page1 = document.getElementById("wiki1").value;
         page2 = document.getElementById("wiki2").value;
 
-        input1 = 'https://en.wikipedia.org/wiki/Bayesian_statistics'
-        input2 = 'https://en.wikipedia.org/wiki/Machine_learning'
         var myHeaders = new Headers();
         myHeaders.append("Accept", "application/json");
         myHeaders.append("Content-Type", "application/json");
 
-        var raw = JSON.stringify({"a": input1, "b": input2});
+        var raw = JSON.stringify({"a": page1, "b": page2});
 
         var requestOptions = {
             mode: 'cors',

@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from scrap import scatter_vis
+from scat import scatter_vis
 
 origins = [
     "*",
