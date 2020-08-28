@@ -34,6 +34,12 @@ class Item(BaseModel):
 def read_item(item):
     return item
 
+@app.get("/items/")
+async def get_item():
+    result_dir = "results/"
+    iterator = os.listdir(result_dir)
+    filenames = [result_dir + filename for filename in iterator]
+    return filenames
 
 @app.post("/items/")
 async def create_item(item: Item):
@@ -42,7 +48,8 @@ async def create_item(item: Item):
     loc = result_dir + filename
     if not os.path.exists(loc):
         f = scatter_vis(item.a, item.b, item.c)
-        open(loc, 'wb').write(f.encode('utf-8'))
+        with open(loc, 'wb') as f:
+            f.write(f.encode('utf-8'))
 
     return loc
 
