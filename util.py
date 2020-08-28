@@ -1,6 +1,7 @@
-from typeguard import typechecked
 import time
-#import os
+
+
+# import os
 
 
 def timeit(method):
@@ -43,10 +44,10 @@ def spy(x):
 #             raw_texts.append(raw_text)
 #     return raw_texts
 
-#@overload
-#@dispatch
+# @overload
+# @dispatch
 
-#pytest fixtures
+# pytest fixtures
 #
 
 # class TextClean:

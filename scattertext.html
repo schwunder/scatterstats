@@ -1,37 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--<script data-dapp-detection="">-->
+<!--    (function () {-->
+<!--        let alreadyInsertedMetaTag = false-->
+
+<!--        function __insertDappDetected() {-->
+<!--            if (!alreadyInsertedMetaTag) {-->
+<!--                const meta = document.createElement('meta')-->
+<!--                meta.name = 'dapp-detected'-->
+<!--                document.head.appendChild(meta)-->
+<!--                alreadyInsertedMetaTag = true-->
+<!--            }-->
+<!--        }-->
+
+<!--        if (window.hasOwnProperty('web3')) {-->
+<!--            // Note a closure can't be used for this var because some sites like-->
+<!--            // www.wnyc.org do a second script execution via eval for some reason.-->
+<!--            window.__disableDappDetectionInsertion = true-->
+<!--            // Likely oldWeb3 is undefined and it has a property only because-->
+<!--            // we defined it. Some sites like wnyc.org are evaling all scripts-->
+<!--            // that exist again, so this is protection against multiple calls.-->
+<!--            if (window.web3 === undefined) {-->
+<!--                return-->
+<!--            }-->
+<!--            __insertDappDetected()-->
+<!--        } else {-->
+<!--            var oldWeb3 = window.web3-->
+<!--            Object.defineProperty(window, 'web3', {-->
+<!--                configurable: true,-->
+<!--                set: function (val) {-->
+<!--                    if (!window.__disableDappDetectionInsertion)-->
+<!--                        __insertDappDetected()-->
+<!--                    oldWeb3 = val-->
+<!--                },-->
+<!--                get: function () {-->
+<!--                    if (!window.__disableDappDetectionInsertion)-->
+<!--                        __insertDappDetected()-->
+<!--                    return oldWeb3-->
+<!--                }-->
+<!--            })-->
+<!--        }-->
+<!--    })()</script>-->
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-
-
+<!--    <script charset="utf-8" src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>-->
+<!--    <script charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.min.js"></script>-->
 </head>
 <body>
 <form>
     <label for="wiki1">wiki1:</label><br>
-    <input type="text" id="wiki1" name="wiki1"><br>
+    <input id="wiki1" name="wiki1" type="text" placeholder="wikipage"><br>
     <label for="wiki2">wiki2:</label><br>
-    <input type="text" id="wiki2" name="wiki2">
+    <input id="wiki2" name="wiki2" type="text" placeholder="wikipage">
+    <label for="size">size:</label><br>
+    <input id="size" name="size" type="number" placeholder="5"><br>
+
 </form>
-<button id="hubert" type="button" onclick="myFunction()">commit</button>
-<div id="hi">
-    "dsfas"
-</div>
-
+<button id="hubert" onclick="myFunction()" type="button">commit</button>
+<div id="scattertextinject">22</div>
+<div id="cached-results">ReSULTS!!!</div>
 <script>
-
-    const url = "http://127.0.0.1:8000/items/5"
+    // todo print pages from scattertext. list tag headline
+    const url = "http://127.0.0.1:8000/items/"
 
     function myFunction() {
-        var page1 = document.getElementById("wiki1").value;
-        var page2 = document.getElementById("wiki2").value;
-        console.log(page2, typeof (page2))
-
+        var page1 = "https://en.wikipedia.org/wiki/Capitalism"
+        var page2 = "https://en.wikipedia.org/wiki/Communism"
+        page1 = document.getElementById("wiki1").value || page1;
+        page2 = document.getElementById("wiki2").value || page2;
+        var size = document.getElementById("size").value || 5;
+        console.log(size)
         var myHeaders = new Headers();
         myHeaders.append("Accept", "application/json");
         myHeaders.append("Content-Type", "application/json");
 
-        var raw = JSON.stringify({"a": page1, "b": page2});
+        var raw = JSON.stringify({"a": page1, "b": page2, "c": size});
 
         var requestOptions = {
             mode: 'cors',
@@ -41,12 +85,22 @@
             redirect: 'follow'
         };
 
-        fetch("http://127.0.0.1:8000/items/", requestOptions)
+        function open_result_as_window(result) {
+
+            return window.open(result)
+        }
+
+        const square = a => a * a;
+
+
+        fetch(url, requestOptions)
             .then(response => response.json())
-            .then(r => {console.log(r);
-            return r})
+            .then(r => {
+                console.log(r, typeof (r));
+                return r
+            })
             .then(result => window.open(result))
-            //.then(result => document.getElementsByTagName("html")[0].innerHTML = result)
+            //.then(result => document.getElementById("scattertextinject").innerHTML = result)
             .catch(error => console.log('error', error))
 
 

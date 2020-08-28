@@ -1,29 +1,38 @@
-from scrap import scrap_pipe
-from clean import clean_pipe
-from toolz import thread_first
-from util import timeit
-import spacy
+from typing import List
+
 import pandas as pd
 import scattertext as st
+import spacy
+from toolz import thread_first
 from typeguard import typechecked
 
+from clean import clean_pipe
+from scrap import scrap_pipe
 
-#@timeit
+
+# @timeit
 @typechecked
-def scat_pipe(in_page: str, label: str) -> pd.DataFrame:
+def scat_pipe(in_page: str, label: str, size: int) -> pd.DataFrame:
     return thread_first(in_page,
-                        (scrap_pipe, label),
+                        (scrap_pipe, label, size),
                         (clean_pipe, label)
                         )
 
 
-#@timeit
 @typechecked
-def scatter_vis(in1: str, in2: str):
+def get_page_lists(in1: str, in2: str) -> List[List]:
+    x = get_page_lists(in1)
+    y = get_page_lists(in2)
+    return [x, y]
+
+
+# @timeit
+@typechecked
+def scatter_vis(in1: str, in2: str, size: int):
     lab1 = str(in1.split("/")[-1])
     lab2 = str(in2.split("/")[-1])
 
-    df = scat_pipe(in1, lab1).append(scat_pipe(in2, lab2), ignore_index=True)
+    df = scat_pipe(in1, lab1, size).append(scat_pipe(in2, lab2, size), ignore_index=True)
     nlp = spacy.load("en")
     corpus = st.CorpusFromPandas(df, category_col='labels', text_col='texts', nlp=nlp).build()
     html = st.produce_scattertext_explorer(corpus,
@@ -33,9 +42,3 @@ def scatter_vis(in1: str, in2: str):
                                            width_in_pixels=1000,
                                            )
     return html
-
-
-input1 = 'https://en.wikipedia.org/wiki/Capitalism'
-input2 = 'https://en.wikipedia.org/wiki/Communism'
-h = scatter_vis(input1, input2)
-open("Visualization.html", 'wb').write(h.encode('utf-8'))

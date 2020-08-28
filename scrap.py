@@ -1,15 +1,18 @@
-import requests
+from typing import List, Union
+
 import bs4
+import requests
 import wikipediaapi
 from bs4 import BeautifulSoup
 from toolz import thread_first
 from typeguard import typechecked
-from typing import List, Dict, Union
-from util import timeit
 
 Maybe_WikiPages = List[Union[None, wikipediaapi.WikipediaPage]]
 
 
+# TODO!
+# 1. works with ANY wikipage (not only with series table)
+# 2. Shows pages that are in the data
 # @timeit
 @typechecked
 def get_soup(elem: requests.models.Response) -> BeautifulSoup:
@@ -20,9 +23,9 @@ def get_soup(elem: requests.models.Response) -> BeautifulSoup:
 # @timeit
 @typechecked
 def get_html_elem(elem: BeautifulSoup) -> bs4.element.Tag:
-    navtable = elem.find_all('table', attrs={'class': 'vertical-navbox nowraplinks hlist'}) or elem.find_all('table',
-                                                                                                             attrs={
-                                                                                                                 'class': 'vertical-navbox nowraplinks'})
+    navtable = elem.find_all('table', attrs={'class': 'vertical-navbox nowraplinks hlist'}) or \
+               elem.find_all('table', attrs={'class': 'vertical-navbox nowraplinks'}) or \
+               elem.find_all('div', attrs={'class': 'mw-body'})
     return navtable[0]
 
 
@@ -36,7 +39,10 @@ def get_links_to_elem(elem: bs4.element.Tag, max=5) -> List[Union[str, None]]:
 # @timeit
 @typechecked
 def get_pure_links(elem: List[Union[str, None]]) -> List[Union[str, None]]:
-    pure_links = [w.split("/")[-1] for w in elem if w and "/wiki/" in w]
+    # bad = ['jpg']
+    pure_links = []
+    [pure_links.append(w.split("/")[-1]) for w in elem if
+     w and "/wiki/" in w and 'jpg' not in w and w.split("/")[-1] not in pure_links]
     return pure_links
 
 
@@ -60,12 +66,22 @@ def get_texts_from_pages(elem: Maybe_WikiPages) -> List[Union[str, None]]:
 
 # @timeit
 @typechecked
-def scrap_pipe(in_page: str, label: str) -> List[Union[str, None]]:
+def scrap_pipe(in_page: str, label: str, size: int) -> List[Union[str, None]]:
     return thread_first(in_page,
                         requests.get,
                         get_soup,
                         get_html_elem,
-                        (get_links_to_elem, 5),
+                        (get_links_to_elem, size),
                         get_pure_links,
                         (get_pages_from_links, label),
                         get_texts_from_pages)
+
+
+@typechecked
+def get_page_list(in_page: str) -> List[Union[str, None]]:
+    return thread_first(in_page,
+                        requests.get,
+                        get_soup,
+                        get_html_elem,
+                        (get_links_to_elem, 25),
+                        get_pure_links)
