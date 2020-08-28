@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 import scattertext as st
 import spacy
@@ -8,6 +6,7 @@ from typeguard import typechecked
 
 from clean import clean_pipe
 from scrap import scrap_pipe
+from util import last_of_route
 
 
 # @timeit
@@ -19,18 +18,18 @@ def scat_pipe(in_page: str, label: str, size: int) -> pd.DataFrame:
                         )
 
 
-@typechecked
-def get_page_lists(in1: str, in2: str) -> List[List]:
-    x = get_page_lists(in1)
-    y = get_page_lists(in2)
-    return [x, y]
+# @typechecked
+# def get_page_lists(in1: str, in2: str) -> List[List]:
+#     x = get_page_lists(in1)
+#     y = get_page_lists(in2)
+#     return [x, y]
 
 
 # @timeit
 @typechecked
 def scatter_vis(in1: str, in2: str, size: int):
-    lab1 = str(in1.split("/")[-1])
-    lab2 = str(in2.split("/")[-1])
+    lab1 = last_of_route(in1)
+    lab2 = last_of_route(in2)
 
     df = scat_pipe(in1, lab1, size).append(scat_pipe(in2, lab2, size), ignore_index=True)
     nlp = spacy.load("en")

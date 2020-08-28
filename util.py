@@ -1,5 +1,7 @@
 import time
 
+from typeguard import typechecked
+
 
 # import os
 
@@ -18,6 +20,11 @@ def timeit(method):
         return result
 
     return timed
+
+
+@typechecked
+def last_of_route(pagename: str) -> str:
+    return str(pagename.split("/")[-1])
 
 
 def safe(x, fn):

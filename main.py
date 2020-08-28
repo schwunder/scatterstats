@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
+import os
 from scat import scatter_vis
+from util import last_of_route
 
 origins = [
     "*",
@@ -33,18 +34,16 @@ class Item(BaseModel):
 def read_item(item):
     return item
 
-#def str_from_item():
-
-
 
 @app.post("/items/")
 async def create_item(item: Item):
     result_dir = "results/"
-    #if not in /results calculate
-    f = scatter_vis(item.a, item.b, item.c)
-    filename = str(item.a.split("/")[-1]) + "-" + str(item.b.split("/")[-1]) + "-" + str(item.c)
-    loc = result_dir + filename + ".html"
-    open(loc, 'wb').write(f.encode('utf-8'))
+    filename = last_of_route(item.a) + "-" + last_of_route(item.b) + "-" + str(item.c) + ".html"
+    loc = result_dir + filename
+    if not os.path.exists(loc):
+        f = scatter_vis(item.a, item.b, item.c)
+        open(loc, 'wb').write(f.encode('utf-8'))
+
     return loc
 
 # @app.get("/")

@@ -7,12 +7,11 @@ from bs4 import BeautifulSoup
 from toolz import thread_first
 from typeguard import typechecked
 
+from util import last_of_route
+
 Maybe_WikiPages = List[Union[None, wikipediaapi.WikipediaPage]]
 
 
-# TODO!
-# 1. works with ANY wikipage (not only with series table)
-# 2. Shows pages that are in the data
 # @timeit
 @typechecked
 def get_soup(elem: requests.models.Response) -> BeautifulSoup:
@@ -41,8 +40,8 @@ def get_links_to_elem(elem: bs4.element.Tag, max=5) -> List[Union[str, None]]:
 def get_pure_links(elem: List[Union[str, None]]) -> List[Union[str, None]]:
     # bad = ['jpg']
     pure_links = []
-    [pure_links.append(w.split("/")[-1]) for w in elem if
-     w and "/wiki/" in w and 'jpg' not in w and w.split("/")[-1] not in pure_links]
+    [pure_links.append(last_of_route(w)) for w in elem if
+     w and "/wiki/" in w and 'jpg' not in w and last_of_route(w) not in pure_links]
     return pure_links
 
 
@@ -76,12 +75,11 @@ def scrap_pipe(in_page: str, label: str, size: int) -> List[Union[str, None]]:
                         (get_pages_from_links, label),
                         get_texts_from_pages)
 
-
-@typechecked
-def get_page_list(in_page: str) -> List[Union[str, None]]:
-    return thread_first(in_page,
-                        requests.get,
-                        get_soup,
-                        get_html_elem,
-                        (get_links_to_elem, 25),
-                        get_pure_links)
+# @typechecked
+# def get_page_list(in_page: str) -> List[Union[str, None]]:
+#     return thread_first(in_page,
+#                         requests.get,
+#                         get_soup,
+#                         get_html_elem,
+#                         (get_links_to_elem, 25),
+#                         get_pure_links)
