@@ -14,9 +14,23 @@
     <input id="size" name="size" placeholder="5" type="number">
 </form>
 <button id="hubert" onclick="myFunction()" type="button">commit</button>
+<div>
+<ul id="results">
+
+
+
+</ul>
+</div>
 <script>
     const url = "http://127.0.0.1:8000/items/"
-
+    function append_to_div(result_elem) {
+        result_elem.forEach(elem => {
+            var node = document.createElement("a");                 // Create a <li> node
+            var textnode = document.createTextNode(elem);         // Create a text node
+            node.appendChild(textnode);                              // Append the text to <li>
+            node.href = elem;
+            document.getElementById("results").appendChild(node);     // Append <li> to <ul> with id="myList"
+        })}
     function myFunction() {
         var page1 = "https://en.wikipedia.org/wiki/Capitalism"
         var page2 = "https://en.wikipedia.org/wiki/Communism"
@@ -26,6 +40,8 @@
         var myHeaders = new Headers();
         myHeaders.append("Accept", "application/json");
         myHeaders.append("Content-Type", "application/json");
+
+
 
         var raw = JSON.stringify({"a": page1, "b": page2, "c": size});
 
@@ -43,17 +59,21 @@
             .then(result => window.open(result))
             .catch(error => console.log('error', error))
 
-        var requestOptions = {
-            method: 'GET',
-            redirect: 'follow'
-        };
 
-        fetch("http://127.0.0.1:8000/items/?method=GET", requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
 
     }
+
+    var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+    };
+
+    fetch("http://127.0.0.1:8000/items/?method=GET", requestOptions)
+            .then(response => response)
+        .then(result => result.text())
+        .then(r => JSON.parse(r))
+            .then(result => console.log(append_to_div(result)))
+            .catch(error => console.log('error', error));
 
 
 </script>
