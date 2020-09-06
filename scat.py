@@ -3,7 +3,7 @@ import scattertext as st
 import spacy
 from toolz import thread_first
 from typeguard import typechecked
-
+from model import nlp
 from clean import clean_pipe
 from scrap import scrap_pipe
 from util import last_of_route
@@ -32,7 +32,6 @@ def scatter_vis(in1: str, in2: str, size: int):
     lab2 = last_of_route(in2)
 
     df = scat_pipe(in1, lab1, size).append(scat_pipe(in2, lab2, size), ignore_index=True)
-    nlp = spacy.load("en")
     corpus = st.CorpusFromPandas(df, category_col='labels', text_col='texts', nlp=nlp).build()
     html = st.produce_scattertext_explorer(corpus,
                                            category=lab1,
@@ -41,3 +40,8 @@ def scatter_vis(in1: str, in2: str, size: int):
                                            width_in_pixels=1000,
                                            )
     return html
+
+#
+x = scatter_vis('https://en.wikipedia.org/wiki/Tweed_Courthouse', 'https://en.wikipedia.org/wiki/GW190521', 5)
+with open("aa.html", 'wb') as f:
+    f.write(x.encode('utf-8'))

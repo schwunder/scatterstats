@@ -4,7 +4,7 @@ import pandas as pd
 import spacy
 from toolz import thread_first
 from typeguard import typechecked
-
+from model import nlp
 
 # @timeit
 @typechecked
@@ -17,7 +17,7 @@ def clean_text_list(raw_texts: List[str]) -> List[str]:
 
 # @timeit
 @typechecked
-def filter_stopwords(text: str, nlp=spacy.load("en")) -> str:
+def filter_stopwords(text: str, nlp=nlp) -> str:
     doc = nlp(text)
     bad = "\\"
     return ' '.join([word for word in [token.text for token in doc] if
@@ -32,7 +32,7 @@ def filter_stopwords_wrap(texts: List[str]) -> List[str]:
 
 # @timeit
 @typechecked
-def filter_pos(text: str, pos: str, nlp=spacy.load("en")) -> str:
+def filter_pos(text: str, pos: str, nlp=nlp) -> str:
     doc = nlp(text)
     return " ".join([token.text for token in doc if token.pos_ != pos])
 
